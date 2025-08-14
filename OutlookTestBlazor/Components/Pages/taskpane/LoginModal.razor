@@ -1,0 +1,33 @@
+﻿<div class="modal @(IsOpen ? "show" : "")" style="display:@(IsOpen ? "block" : "none")">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5>Sign In</h5></div>
+            <div class="modal-body">
+                <label>User Name:</label>
+                <input @bind="Username" class="form-control" />
+                <label>Password:</label>
+                <input type="password" @bind="Password" class="form-control" />
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" @onclick="OnSubmit">Sign In</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback OnLoginSuccess { get; set; }
+
+    private string Username;
+    private string Password;
+
+    private async Task OnSubmit()
+    {
+        // Replace with your auth logic or connect it to OpenID Connect
+        if (Username == "johndoe" && Password == "password")
+        {
+            await OnLoginSuccess.InvokeAsync();
+        }
+    }
+}

@@ -1,0 +1,30 @@
+﻿@page "/taskpane"
+@inject NavigationManager Navigation
+
+@if (!IsAuthenticated)
+{
+    <div class="task-pane-header">
+        <img src="/images/logo.png" alt="Sage x3 Connector logo" />
+        <h3>Welcome to the Sage connector</h3>
+        <button class="btn btn-success" @onclick="ShowLogin">Login</button>
+    </div>
+}
+else
+{
+    <HomePage />
+}
+
+<LoginModal @bind-IsOpen="ShowLoginModal" OnLoginSuccess="HandleLoginSuccess" />
+
+@code {
+    private bool IsAuthenticated = false;
+    private bool ShowLoginModal = false;
+
+    private void ShowLogin() => ShowLoginModal = true;
+
+    private void HandleLoginSuccess()
+    {
+        IsAuthenticated = true;
+        ShowLoginModal = false;
+    }
+}

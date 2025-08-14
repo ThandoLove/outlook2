@@ -1,0 +1,66 @@
+﻿@inject EmailService EmailService
+@inject SageX3Service SageX3Service
+@inject ActivityLogService LogService
+
+@if (IsOpen)
+{
+    <div class="modal show">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5>Create @EntityType</h5></div>
+                <div class="modal-body">
+                    <label>Email:</label>
+                    <select class="form-select" @bind="SelectedEmail">
+                        @foreach (var email in AvailableEmails)
+                        {
+                            <option value="@email">@email</option>
+                        }
+                    </select>
+                    <label>Name:</label>
+                    <input class="form-control" @bind="Name" />
+
+                    <label>Phone:</label>
+                    <input class="form-control" @bind="Phone" />
+
+                    <label>Notes:</label>
+                    <textarea class="form-control" @bind="Notes"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" @onclick="Submit">Save to Sage X3</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string ? EntityType { get; set; } // "Contact", "Lead", "Opportunity"
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private List<string> AvailableEmails = new();
+    private string ? SelectedEmail;
+    private string ? Name;
+    private string  ? Phone;
+    private string ? Notes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AvailableEmails = await EmailService.GetCurrentEmailAddresses();
+    }
+
+    private async Task Submit()
+    {
+        await SageX3Service.CreateEntity(EntityType, new()
+        {
+            Email = SelectedEmail,
+            Name = Name,
+            Phone = Phone,
+            Notes = Notes
+        });
+
+        await LogService.LogCreation(EntityType, SelectedEmail, Name);
+
+        await OnClose.InvokeAsync();
+    }
+}

@@ -1,0 +1,48 @@
+﻿@page "/auth/login"
+
+@inject NavigationManager Nav
+@inject IConfiguration Config
+
+<h3>Login</h3>
+
+@if (!context.User.Identity.IsAuthenticated)
+{
+    <button @onclick="LoginSSO">Login with Microsoft</button>
+    <p>or</p>
+    <EditForm Model="manualLoginModel" OnValidSubmit="LoginManual">
+        <InputText @bind-Value="manualLoginModel.Username" />
+        <InputText @bind-Value="manualLoginModel.Password" type="password" />
+        <button type="submit">Manual Login</button>
+    </EditForm>
+}
+else
+{
+    <p>You are already signed in as @context.User.Identity.Name</p>
+}
+
+@code {
+    private ManualLoginModel manualLoginModel = new();
+
+    private void LoginSSO()
+    {
+        Nav.NavigateTo("MicrosoftIdentity/Account/SignIn", true);
+    }
+
+    private async Task LoginManual()
+    {
+        // Send username/password to backend API (e.g., /api/auth/login)
+        // Store token in localStorage for future use
+    }
+
+    private class ManualLoginModel
+    {
+        public string Username { get; set; } = "";
+        public string Password { get; set; } = "";
+    }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> contextTask { get; set; }
+
+    private AuthenticationState context => contextTask?.Result!;
+}
+

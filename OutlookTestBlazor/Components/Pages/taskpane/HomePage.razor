@@ -1,0 +1,69 @@
+﻿@page "/home"
+@using OutlookTestBlazor.Components.Pages.Shared
+@inject RoleService RoleService
+
+@using static OutlookTestBlazor.Components.Pages.Shared.NavDropdown
+
+<div class="task-pane-header">
+    <img src="/images/logo.png" alt="Sage X3 Logo" />
+</div>
+
+<div class="row mb-3">
+    <NavDropdown Title="Contact"
+                 Items="@(new List<string> { "Add Contact", "View Contact" })"
+                 OnSelect="HandleDropdownSelect" />
+
+    <NavDropdown Title="Lead"
+                 Items="@(new List<string> { "Add Lead", "View Lead" })"
+                 OnSelect="HandleDropdownSelect" />
+
+    <NavDropdown Title="Opportunity"
+                 Items="@(new List<string> { "Add Opportunity", "View Opportunity" })"
+                 OnSelect="HandleDropdownSelect" />
+
+    <NavDropdown Title="Task"
+                 Items="@(new List<string> { "Add Task", "View Task" })"
+                 OnSelect="HandleDropdownSelect" />
+
+    @if (IsManager)
+    {
+        <NavDropdown Title="Admin Tools"
+                     Items="@(new List<string> { "Edit Contact", "Edit Lead", "Edit Opportunity", "Assign Task" })"
+                     OnSelect="HandleDropdownSelect" />
+    }
+</div>
+
+
+
+@code {
+    private bool IsManager = false;
+    private bool ShowCreateModal = false;
+    private string ModalEntityType = "";
+
+    protected override void OnInitialized()
+    {
+        IsManager = RoleService.IsManager();
+    }
+
+    private void HandleDropdownSelect(string selectedItem)
+    {
+        if (selectedItem.StartsWith("Add"))
+        {
+            ModalEntityType = selectedItem.Replace("Add ", "");
+            ShowCreateModal = true;
+        }
+        else if (selectedItem.StartsWith("Edit") || selectedItem == "Assign Tasks")
+        {
+            // TODO: Handle other admin actions
+        }
+        else if (selectedItem.StartsWith("View"))
+        {
+            // TODO: Navigate to or show view list
+        }
+    }
+
+    private void CloseModal()
+    {
+        ShowCreateModal = false;
+    }
+}
